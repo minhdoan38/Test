@@ -1,0 +1,283 @@
+        :root {
+            --primary-color: #00b894; /* Xanh lá dược phẩm */
+            --secondary-color: #0984e3; /* Xanh dương y tế */
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        /* Sidebar Filter */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .filter-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2d3436;
+        }
+
+        /* Product Card */
+        .product-card a {
+            text-decoration: none;
+        }
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background: white;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .product-img-container {
+            height: 200px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .badge-prescription {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff7675;
+            color: white;
+            font-size: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .product-body {
+            padding: 15px;
+        }
+        .product-category {
+            font-size: 12px;
+            color: #636e72;
+            text-transform: uppercase;
+        }
+        .product-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 5px 0;
+            color: #2d3436;
+        }
+        .product-price {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .btn-add-cart {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            width: 100%;
+            border: none;
+            padding: 8px;
+            transition: 0.3s;
+        }
+        .btn-add-cart:hover {
+            background-color: #00947a;
+            color: white;
+        }
+
+        /* --- PRODUCT GALLERY (Cột Trái) --- */
+.product-gallery {
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #eee;
+    background: #fff;
+    padding: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 400px; /* Cố định chiều cao khung ảnh */
+}
+
+.main-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.product-gallery:hover .main-img {
+    transform: scale(1.05); /* Zoom nhẹ khi di chuột */
+}
+
+/* Nhãn thuốc kê đơn */
+.prescription-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: var(--danger-color); /* Lấy từ style.css gốc */
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(255, 118, 117, 0.4);
+    z-index: 2;
+}
+
+/* --- PRODUCT INFO (Cột Phải) --- */
+.product-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2d3436;
+    margin-bottom: 10px;
+}
+
+.price-box {
+    background: #f8f9fa;
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.current-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.unit-text {
+    font-size: 1rem;
+    color: #636e72;
+    margin-left: 5px;
+}
+
+.short-desc {
+    color: #636e72;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+/* Chính sách (Policy Box) */
+.policy-box {
+    display: flex;
+    gap: 20px;
+    border-top: 1px dashed #dfe6e9;
+    border-bottom: 1px dashed #dfe6e9;
+    padding: 15px 0;
+}
+
+.policy-item {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2d3436;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- BỘ ĐIỀU KHIỂN SỐ LƯỢNG --- */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    border: 2px solid #dfe6e9;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity-control button {
+    background: #f1f2f6;
+    border: none;
+    width: 40px;
+    height: 45px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.9rem;
+}
+
+.quantity-control button:hover {
+    background: #dfe6e9;
+}
+
+.quantity-control input {
+    width: 50px;
+    height: 45px;
+    text-align: center;
+    border: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    /* Ẩn mũi tên mặc định của input number */
+    -moz-appearance: textfield;
+}
+.quantity-control input::-webkit-outer-spin-button,
+.quantity-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.btn-buy {
+    background-color: var(--primary-color);
+    border: none;
+    height: 48px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+    transition: 0.3s;
+}
+
+.btn-buy:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+/* --- TABS MÔ TẢ --- */
+.nav-tabs .nav-link {
+    color: #636e72;
+    font-weight: 600;
+    border: none;
+    padding: 12px 25px;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    background: transparent;
+}
+
+.tab-content h5 {
+    font-weight: 700;
+    color: #2d3436;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.tab-content p {
+    color: #636e72;
+    line-height: 1.7;
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .policy-box {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .product-name {
+        font-size: 1.4rem;
+    }
+}

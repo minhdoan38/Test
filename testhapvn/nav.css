@@ -1,0 +1,98 @@
+/* navbar.css */
+.navbar-floating {
+    position: sticky;
+    top: 20px;
+    z-index: 1000;
+    margin: 0 20px;
+    background: rgba(255, 255, 255, 0.85); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 50px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 10px 25px;
+    transition: all 0.4s ease;
+}
+
+/* Hiệu ứng thu lại khi cuộn trang */
+.navbar-floating.scrolled {
+    top: 0;
+    margin: 0;
+    border-radius: 0 0 20px 20px;
+    background: #ffffff;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    color: #00b894 !important;
+    font-size: 1.3rem;
+}
+
+.nav-link {
+    font-weight: 600;
+    color: #2d3436 !important;
+    margin: 0 8px;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: #00b894 !important;
+}
+
+/* Dropdown Menu Style */
+.dropdown-menu {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    padding: 12px;
+    margin-top: 15px !important;
+    animation: slideIn 0.3s ease-out;
+}
+
+.dropdown-item {
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #e8f8f5;
+    color: #00b894;
+    transform: translateX(5px);
+}
+
+/* Search Box trong Nav */
+.search-box {
+    background: #f1f2f6;
+    border-radius: 25px;
+    padding: 8px 18px;
+    align-items: center;
+    position: relative;
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.9rem;
+    width: 150px;
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        position: fixed;
+        top: 10px;
+        margin-left: 20px;
+        left: 200px;
+    }
+}
+
+.badge{
+    color: black;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
