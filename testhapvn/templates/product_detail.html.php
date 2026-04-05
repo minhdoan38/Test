@@ -81,6 +81,105 @@
 
             <div class="row mt-5">
                 <div class="col-12">
+                    <div class="p-4 bg-white border rounded shadow-sm">
+                        <h5>Mô tả sản phẩm</h5>
+                        <p class="mb-0"><?php echo nl2br(htmlspecialchars($product['description'] ?? '', ENT_QUOTES, 'UTF-8')); ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4" id="reviews">
+                <div class="col-12">
+                    <div class="p-4 bg-white border rounded shadow-sm">
+                        <h5 class="mb-3">Đánh giá thực tế từ khách hàng</h5>
+
+                        <?php if (isset($_SESSION['user_id'])) { ?>
+                            <form action="product_detail.php?id=<?php echo (int) $product['product_id']; ?>#reviews" method="POST" enctype="multipart/form-data" class="comment-form mb-4">
+                                <input type="hidden" name="action" value="add_comment">
+                                <div class="mb-2">
+                                    <label class="form-label">Nội dung bình luận (<?php echo htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8'); ?>)</label>
+                                    <textarea class="form-control" name="content" rows="3" required placeholder="Chia sẻ trải nghiệm thực tế..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Đính kèm ảnh/video</label>
+                                    <input type="file" class="form-control" name="media" accept="image/*,video/*">
+                                </div>
+                                <button class="btn btn-success" type="submit"><i class="fa-solid fa-paper-plane me-1"></i>Gửi bình luận</button>
+                            </form>
+                        <?php } else { ?>
+                            <div class="alert alert-warning">Vui lòng <a href="authentication.php">đăng nhập</a> để bình luận và phản hồi.</div>
+                        <?php } ?>
+
+                        <?php if (empty($comments)) { ?>
+                            <p class="text-muted">Chưa có bình luận nào cho sản phẩm này.</p>
+                        <?php } ?>
+
+                        <?php foreach ($comments as $comment) { ?>
+                            <div class="comment-item <?php echo (int) $comment['is_pinned'] === 1 ? 'pinned-comment' : ''; ?>">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($comment['customer_name'] ?: 'Khách hàng', ENT_QUOTES, 'UTF-8'); ?></strong>
+                                        <?php if ((int) $comment['is_pinned'] === 1) { ?>
+                                            <span class="badge bg-warning text-dark ms-2"><i class="fa-solid fa-thumbtack"></i> Ghim</span>
+                                        <?php } ?>
+                                        <div class="text-muted small"><?php echo htmlspecialchars($comment['created_at'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                    </div>
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') { ?>
+                                        <form method="POST" action="product_detail.php?id=<?php echo (int) $product['product_id']; ?>#reviews">
+                                            <input type="hidden" name="action" value="pin_comment">
+                                            <input type="hidden" name="comment_id" value="<?php echo (int) $comment['comment_id']; ?>">
+                                            <button class="btn btn-sm btn-outline-secondary" type="submit">Ghim/Bỏ ghim</button>
+                                        </form>
+                                    <?php } ?>
+                                </div>
+
+                                <p class="mt-2 mb-2"><?php echo nl2br(htmlspecialchars($comment['content'], ENT_QUOTES, 'UTF-8')); ?></p>
+
+                                <?php if (!empty($comment['media_path'])) { ?>
+                                    <div class="comment-media mb-2">
+                                        <?php if ($comment['media_type'] === 'image') { ?>
+                                            <img src="<?php echo htmlspecialchars($comment['media_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="media comment" class="img-fluid rounded">
+                                        <?php } elseif ($comment['media_type'] === 'video') { ?>
+                                            <video controls class="w-100 rounded">
+                                                <source src="<?php echo htmlspecialchars($comment['media_path'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            </video>
+                                        <?php } ?>
+                                    </div>
+                                <?php } ?>
+
+                                <?php if (isset($_SESSION['user_id'])) { ?>
+                                    <details>
+                                        <summary class="reply-toggle">Trả lời bình luận</summary>
+                                        <form action="product_detail.php?id=<?php echo (int) $product['product_id']; ?>#reviews" method="POST" enctype="multipart/form-data" class="mt-2">
+                                            <input type="hidden" name="action" value="add_reply">
+                                            <input type="hidden" name="parent_comment_id" value="<?php echo (int) $comment['comment_id']; ?>">
+                                            <div class="mb-2">
+                                                <textarea class="form-control form-control-sm" name="content" rows="2" required placeholder="Nhập nội dung phản hồi..."></textarea>
+                                            </div>
+                                            <div class="mb-2">
+                                                <input type="file" class="form-control form-control-sm" name="media" accept="image/*,video/*">
+                                            </div>
+                                            <button class="btn btn-sm btn-outline-success" type="submit">Gửi phản hồi</button>
+                                        </form>
+                                    </details>
+                                <?php } ?>
+
+                                <?php if (!empty($repliesByComment[$comment['comment_id']])) { ?>
+                                    <div class="replies mt-3">
+                                        <?php foreach ($repliesByComment[$comment['comment_id']] as $reply) { ?>
+                                            <div class="reply-item">
+                                                <strong><?php echo htmlspecialchars($reply['customer_name'] ?: 'Khách hàng', ENT_QUOTES, 'UTF-8'); ?></strong>
+                                                <div class="text-muted small"><?php echo htmlspecialchars($reply['created_at'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                                <p class="mb-1"><?php echo nl2br(htmlspecialchars($reply['content'], ENT_QUOTES, 'UTF-8')); ?></p>
+
+                                                <?php if (!empty($reply['media_path'])) { ?>
+                                                    <?php if ($reply['media_type'] === 'image') { ?>
+                                                        <img src="<?php echo htmlspecialchars($reply['media_path'], ENT_QUOTES, 'UTF-8'); ?>" alt="reply media" class="img-fluid rounded reply-media">
+                                                    <?php } elseif ($reply['media_type'] === 'video') { ?>
+                                                        <video controls class="w-100 rounded reply-media">
+                                                            <source src="<?php echo htmlspecialchars($reply['media_path'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                        </video>
+                                                    <?php } ?>
                     <div class="description-tabs">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item">
@@ -195,6 +294,7 @@
                                     </div>
                                 <?php } ?>
                             </div>
+                        <?php } ?>
                         </div>
                     </div>
                 </div>
@@ -207,6 +307,10 @@
                     <?php foreach ($recommendedProducts as $item) { ?>
                         <div class="col-md-3 col-sm-6">
                             <div class="product-card h-100">
+                                <div class="product-img-container recommended-image-box">
+                                    <img src="uploads/<?php echo htmlspecialchars($item['image_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                                         onerror="this.src='https://via.placeholder.com/200'"
+                                         class="img-fluid recommended-image"
                                 <div class="product-img-container">
                                     <img src="uploads/<?php echo htmlspecialchars($item['image_url'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
                                          onerror="this.src='https://via.placeholder.com/200'"

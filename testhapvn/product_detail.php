@@ -56,8 +56,12 @@ try {
         }
 
         if ($action === 'add_comment' || $action === 'add_reply') {
+            if (!isset($_SESSION['user_id'])) {
+                header('Location: authentication.php');
+                exit;
+            }
+
             $content = trim($_POST['content'] ?? '');
-            $customerName = trim($_POST['customer_name'] ?? '');
             $parentCommentId = $action === 'add_reply' ? filter_input(INPUT_POST, 'parent_comment_id', FILTER_VALIDATE_INT) : null;
 
             if ($content !== '') {
@@ -87,9 +91,7 @@ try {
                     }
                 }
 
-                if ($customerName === '') {
-                    $customerName = isset($_SESSION['username']) ? $_SESSION['username'] : 'Khách hàng';
-                }
+                $customerName = $_SESSION['username'] ?? 'Khách hàng';
 
                 $sql = "INSERT INTO product_comments (product_id, user_id, parent_comment_id, customer_name, content, media_path, media_type)
                         VALUES (:product_id, :user_id, :parent_comment_id, :customer_name, :content, :media_path, :media_type)";
