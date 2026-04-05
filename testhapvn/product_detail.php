@@ -10,31 +10,35 @@ try {
         exit('Sản phẩm không hợp lệ.');
     }
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS product_views (
-        view_id INT AUTO_INCREMENT PRIMARY KEY,
-        viewer_key VARCHAR(128) NOT NULL,
-        user_id INT NULL,
-        product_id INT NOT NULL,
-        viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_viewer (viewer_key),
-        INDEX idx_product (product_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    if (!isset($_SESSION['product_tables_ready'])) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS product_views (
+            view_id INT AUTO_INCREMENT PRIMARY KEY,
+            viewer_key VARCHAR(128) NOT NULL,
+            user_id INT NULL,
+            product_id INT NOT NULL,
+            viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_viewer (viewer_key),
+            INDEX idx_product (product_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    $pdo->exec("CREATE TABLE IF NOT EXISTS product_comments (
-        comment_id INT AUTO_INCREMENT PRIMARY KEY,
-        product_id INT NOT NULL,
-        user_id INT NULL,
-        parent_comment_id INT NULL,
-        customer_name VARCHAR(120) NULL,
-        content TEXT NOT NULL,
-        media_path VARCHAR(255) NULL,
-        media_type ENUM('image','video') NULL,
-        is_pinned TINYINT(1) DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_product_comment (product_id),
-        INDEX idx_parent_comment (parent_comment_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $pdo->exec("CREATE TABLE IF NOT EXISTS product_comments (
+            comment_id INT AUTO_INCREMENT PRIMARY KEY,
+            product_id INT NOT NULL,
+            user_id INT NULL,
+            parent_comment_id INT NULL,
+            customer_name VARCHAR(120) NULL,
+            content TEXT NOT NULL,
+            media_path VARCHAR(255) NULL,
+            media_type ENUM('image','video') NULL,
+            is_pinned TINYINT(1) DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_product_comment (product_id),
+            INDEX idx_parent_comment (parent_comment_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $_SESSION['product_tables_ready'] = true;
+    }
 
     $viewerKey = isset($_SESSION['user_id']) ? 'user_' . $_SESSION['user_id'] : 'guest_' . session_id();
 
