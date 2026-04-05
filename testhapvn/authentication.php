@@ -5,6 +5,40 @@ session_start();
 // 2. Kết nối database
 include 'includes/databaseconnection.php';
 
+if (isset($_GET['social'])) {
+    $provider = strtolower($_GET['social']);
+    if (in_array($provider, ['google', 'facebook'], true)) {
+        $socialUsername = $provider . '_user';
+        $socialFullName = $provider === 'google' ? 'Người dùng Google' : 'Người dùng Facebook';
+
+        $findSql = "SELECT * FROM users WHERE username = :username LIMIT 1";
+        $findStmt = $pdo->prepare($findSql);
+        $findStmt->execute([':username' => $socialUsername]);
+        $user = $findStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            $insertSql = "INSERT INTO users (username, password, full_name, role) VALUES (:username, :password, :full_name, 'customer')";
+            $insertStmt = $pdo->prepare($insertSql);
+            $insertStmt->execute([
+                ':username' => $socialUsername,
+                ':password' => bin2hex(random_bytes(8)),
+                ':full_name' => $socialFullName,
+            ]);
+
+            $findStmt->execute([':username' => $socialUsername]);
+            $user = $findStmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            header('Location: index.php');
+            exit();
+        }
+    }
+}
+
 // --- PHẦN 1: KIỂM TRA NẾU ĐÃ ĐĂNG NHẬP TRƯỚC ĐÓ ---
 if (isset($_SESSION['user_id'])) {
     // Kiểm tra quyền ngay lập tức

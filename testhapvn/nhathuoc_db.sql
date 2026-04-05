@@ -109,6 +109,40 @@ CREATE TABLE `products` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_comments`
+--
+
+CREATE TABLE `product_comments` (
+  `comment_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `parent_comment_id` int(11) DEFAULT NULL,
+  `customer_name` varchar(120) DEFAULT NULL,
+  `content` text NOT NULL,
+  `media_path` varchar(255) DEFAULT NULL,
+  `media_type` enum('image','video') DEFAULT NULL,
+  `is_pinned` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_views`
+--
+
+CREATE TABLE `product_views` (
+  `view_id` int(11) NOT NULL,
+  `viewer_key` varchar(128) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `product_id` int(11) NOT NULL,
+  `viewed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Dumping data for table `products`
 --
@@ -193,6 +227,24 @@ ALTER TABLE `products`
   ADD KEY `fk_prod_cat` (`category_id`);
 
 --
+-- Indexes for table `product_comments`
+--
+ALTER TABLE `product_comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `idx_product_comment` (`product_id`),
+  ADD KEY `idx_parent_comment` (`parent_comment_id`),
+  ADD KEY `idx_comment_user` (`user_id`);
+
+--
+-- Indexes for table `product_views`
+--
+ALTER TABLE `product_views`
+  ADD PRIMARY KEY (`view_id`),
+  ADD KEY `idx_viewer` (`viewer_key`),
+  ADD KEY `idx_product_view` (`product_id`),
+  ADD KEY `idx_view_user` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -235,6 +287,18 @@ ALTER TABLE `products`
   MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
+-- AUTO_INCREMENT for table `product_comments`
+--
+ALTER TABLE `product_comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `product_views`
+--
+ALTER TABLE `product_views`
+  MODIFY `view_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
@@ -269,6 +333,21 @@ ALTER TABLE `order_details`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `fk_prod_cat` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `product_comments`
+--
+ALTER TABLE `product_comments`
+  ADD CONSTRAINT `fk_comment_parent` FOREIGN KEY (`parent_comment_id`) REFERENCES `product_comments` (`comment_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_comment_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `product_views`
+--
+ALTER TABLE `product_views`
+  ADD CONSTRAINT `fk_view_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_view_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -57,8 +57,8 @@
                 <div class="text-center mt-3">
                     <span class="text-muted small">Hoặc đăng nhập với</span>
                     <div class="mt-2">
-                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="fa-brands fa-google me-1"></i> Google</button>
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="fa-brands fa-facebook me-1"></i> Facebook</button>
+                        <a href="authentication.php?social=google" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="fa-brands fa-google me-1"></i> Google</a>
+                        <a href="authentication.php?social=facebook" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="fa-brands fa-facebook me-1"></i> Facebook</a>
                     </div>
                 </div>
             </form>
