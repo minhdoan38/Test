@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập / Đăng ký - Nhà Thuốc HapVN</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
 
     <div class="auth-container">
-        
+
         <div class="auth-card shadow-lg">
             <div class="text-center mb-4">
-                <a href="index.php">
+                <a href="<?php echo htmlspecialchars(ltrim($returnTo, '/'), ENT_QUOTES, 'UTF-8'); ?>">
                     <h3 class="fw-bold text-success"><i class="fa-solid fa-capsules"></i> HapVN</h3>
                     <p class="text-muted small">Chăm sóc sức khỏe gia đình bạn</p>
                 </a>
-
+                <a class="small text-decoration-none" href="<?php echo htmlspecialchars(ltrim($returnTo, '/'), ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="fa-solid fa-arrow-left"></i> Quay lại trang trước
+                </a>
             </div>
+
+            <?php if (!empty($infoMessage)) { ?>
+                <div class="alert alert-warning py-2"><?php echo htmlspecialchars($infoMessage, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php } ?>
 
             <div class="auth-tabs mb-4">
                 <button class="tab-btn active" onclick="switchForm('login')" id="tab-login">Đăng nhập</button>
@@ -43,7 +49,7 @@
                         <input type="password" name="password" class="form-control" placeholder="********" required>
                     </div>
                 </div>
-                
+
                 <div class="d-flex justify-content-between align-items-center mb-4 small">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="remember">
@@ -53,13 +59,18 @@
                 </div>
 
                 <button type="submit" name="btn_login" class="btn btn-primary w-100 btn-auth">Ðăng Nhập</button>
-                
+
                 <div class="text-center mt-3">
                     <span class="text-muted small">Hoặc đăng nhập với</span>
-                    <div class="mt-2">
-                        <a href="authentication.php?social=google" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="fa-brands fa-google me-1"></i> Google</a>
-                        <a href="authentication.php?social=facebook" class="btn btn-outline-primary btn-sm rounded-pill px-3"><i class="fa-brands fa-facebook me-1"></i> Facebook</a>
+                    <div class="mt-2 d-flex justify-content-center gap-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" disabled aria-disabled="true" title="Tạm thời bảo trì">
+                            <i class="fa-brands fa-google me-1"></i> Google
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" disabled aria-disabled="true" title="Tạm thời bảo trì">
+                            <i class="fa-brands fa-facebook me-1"></i> Facebook
+                        </button>
                     </div>
+                    <div class="small text-muted mt-2">Tạm thời bảo trì đăng nhập mạng xã hội.</div>
                 </div>
             </form>
 
@@ -80,7 +91,7 @@
                     <label class="form-label">Mật khẩu</label>
                     <input type="password" name="password" class="form-control" placeholder="Tối thiểu 6 ký tự" required>
                 </div>
-                
+
                 <div class="form-check mb-4 small">
                     <input type="checkbox" class="form-check-input" required>
                     <label class="form-check-label">Tôi đồng ý với <a href="#" class="text-success">Điều khoản sử dụng</a></label>
