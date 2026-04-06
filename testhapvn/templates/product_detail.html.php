@@ -60,7 +60,9 @@
                         <span class="unit-text">/ <?php echo htmlspecialchars($product['unit'] ?? 'Sản phẩm', ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
 
-                    <p class="short-desc"><?php echo htmlspecialchars($product['meta_description'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p class="short-desc">
+                        <?php echo htmlspecialchars($product['meta_description'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                    </p>
 
                     <div class="policy-box mb-4">
                         <div class="policy-item"><i class="fa-solid fa-check-circle text-success"></i> 100% Chính hãng</div>
