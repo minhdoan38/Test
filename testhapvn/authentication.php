@@ -1,87 +1,101 @@
 <?php
-// 1. Khởi động session
 session_start();
 
-// 2. Kết nối database
 include 'includes/databaseconnection.php';
 
+function isSafeReturnPath(?string $target): bool
+{
+    if ($target === null || $target === '') {
+        return false;
+    }
+
+    $parts = parse_url($target);
+    if ($parts === false) {
+        return false;
+    }
+
+    if (!empty($parts['scheme']) || !empty($parts['host'])) {
+        return false;
+    }
+
+    $path = $parts['path'] ?? '';
+    if ($path === '' || $path[0] !== '/') {
+        return false;
+    }
+
+    return true;
+}
+
+function normalizeReturnPath(?string $target): string
+{
+    if (!isSafeReturnPath($target)) {
+        return '/index.php';
+    }
+
+    return $target;
+}
+
+$infoMessage = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $incomingReturn = $_GET['return_to'] ?? null;
+    if ($incomingReturn !== null && isSafeReturnPath($incomingReturn)) {
+        $_SESSION['return_to_after_login'] = $incomingReturn;
+    }
+}
+
+$returnTo = normalizeReturnPath($_SESSION['return_to_after_login'] ?? '/index.php');
+
 if (isset($_GET['social'])) {
-    $provider = strtolower($_GET['social']);
+    $provider = strtolower((string) $_GET['social']);
     if (in_array($provider, ['google', 'facebook'], true)) {
-        $socialUsername = $provider . '_user';
-        $socialFullName = $provider === 'google' ? 'Người dùng Google' : 'Người dùng Facebook';
+        $infoMessage = 'Tạm thời chưa hỗ trợ đăng nhập bằng Google/Facebook. Vui lòng dùng tài khoản HapVN.';
+    }
+}
 
-        $findSql = "SELECT * FROM users WHERE username = :username LIMIT 1";
-        $findStmt = $pdo->prepare($findSql);
-        $findStmt->execute([':username' => $socialUsername]);
-        $user = $findStmt->fetch(PDO::FETCH_ASSOC);
+if (isset($_SESSION['user_id'])) {
+    $redirectUrl = $returnTo;
 
-        if (!$user) {
-            $insertSql = "INSERT INTO users (username, password, full_name, role) VALUES (:username, :password, :full_name, 'customer')";
-            $insertStmt = $pdo->prepare($insertSql);
-            $insertStmt->execute([
-                ':username' => $socialUsername,
-                ':password' => bin2hex(random_bytes(8)),
-                ':full_name' => $socialFullName,
-            ]);
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin' && $redirectUrl === '/index.php') {
+        $redirectUrl = '/admin.php';
+    }
 
-            $findStmt->execute([':username' => $socialUsername]);
-            $user = $findStmt->fetch(PDO::FETCH_ASSOC);
-        }
+    unset($_SESSION['return_to_after_login']);
+    header('Location: ' . ltrim($redirectUrl, '/'));
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+
+    try {
+        $sql = 'SELECT * FROM users WHERE username = :username AND password = :password';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':username' => $username,
+            ':password' => $password,
+        ]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
-            header('Location: index.php');
-            exit();
-        }
-    }
-}
 
-// --- PHẦN 1: KIỂM TRA NẾU ĐÃ ĐĂNG NHẬP TRƯỚC ĐÓ ---
-if (isset($_SESSION['user_id'])) {
-    // Kiểm tra quyền ngay lập tức
-    if ($_SESSION['role'] == 'admin') {
-        header('Location: admin.php');
-    } else {
-        header('Location: index.php');
-    }
-    exit();
-}
-
-// --- PHẦN 2: XỬ LÝ KHI BẤM NÚT ĐĂNG NHẬP ---
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-
-    try {
-        $sql = "SELECT * FROM users WHERE username = :username AND password = :password";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
-        $stmt->execute();
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user) {
-            // Lưu session
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role']; // Cột này trong DB phải là 'admin' hoặc 'user'
-
-            // --- LOGIC ĐIỀU HƯỚNG QUAN TRỌNG ---
-            if ($user['role'] == 'admin') {
-                header('Location: admin.php');
-            } else {
-                header('Location: index.php');
+            $redirectUrl = normalizeReturnPath($_SESSION['return_to_after_login'] ?? '/index.php');
+            if ($user['role'] === 'admin' && $redirectUrl === '/index.php') {
+                $redirectUrl = '/admin.php';
             }
-            exit();
-            
-        } else {
-            echo "<script>alert('Sai tài khoản hoặc mật khẩu');</script>";
+
+            unset($_SESSION['return_to_after_login']);
+            header('Location: ' . ltrim($redirectUrl, '/'));
+            exit;
         }
+
+        $infoMessage = 'Sai tài khoản hoặc mật khẩu.';
     } catch (PDOException $e) {
-        echo "<script>alert('Lỗi: " . $e->getMessage() . "');</script>";
+        $infoMessage = 'Không thể đăng nhập lúc này. Vui lòng thử lại.';
     }
 }
 
